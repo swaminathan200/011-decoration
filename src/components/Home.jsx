@@ -10,6 +10,9 @@ import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined'; // 
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined'; // Affordable Pricing
 
 import Anniversary from './Anniversary'; 
+import Festivals from './Festivals';
+import KidsSpecial from './KidsSpecial';
+import BabyShower from './BabyShower';
 export default function Home() {
     const features = [
         {
@@ -296,6 +299,9 @@ export default function Home() {
     </Box>
 </Container>
 <Anniversary />
+<Festivals />
+<KidsSpecial />
+<BabyShower/>
         </>
     );
 }
