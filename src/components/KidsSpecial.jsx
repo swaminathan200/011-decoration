@@ -1,5 +1,12 @@
-import React from "react";
-import { Box, Typography, Grid, Card, CardMedia, Button } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import {
+    Box,
+    Typography,
+    Card,
+    CardMedia,
+    Container
+} from "@mui/material";
+import Fade from "@mui/material/Fade";
 
 // ================= ICONS =================
 import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
@@ -8,8 +15,6 @@ import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import CelebrationOutlinedIcon from "@mui/icons-material/CelebrationOutlined";
 import CardGiftcardOutlinedIcon from "@mui/icons-material/CardGiftcardOutlined";
 import CastleOutlinedIcon from "@mui/icons-material/CastleOutlined";
-import AutoFixHighOutlinedIcon from "@mui/icons-material/AutoFixHighOutlined";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 // ========================================
 // KIDS CATEGORY DATA
@@ -26,32 +31,136 @@ const kidsCategories = [
 // ========================================
 // KIDS CARDS DATA
 // ========================================
-const kidsCards = [
-    { title: "Princess Dream", category: "Birthday", image: "/images/kids/princess.png" },
-    { title: "Space Adventure", category: "Birthday", image: "/images/kids/space.png" },
-    { title: "Jungle Safari", category: "1st Birthday", image: "/images/kids/jungle.png" },
-    { title: "Rainbow Fantasy", category: "Birthday", image: "/images/kids/rainbow.png" },
-    { title: "Mickey Magic", category: "1st Birthday", image: "/images/kids/mickey.png" },
-    { title: "Mermaid Underwater", category: "Birthday", image: "/images/kids/mermaid.png" },
-    { title: "Floral Butterfly", category: "Birthday", image: "/images/kids/butterfly.png" },
-    { title: "Hello Kitty", category: "1st Birthday", image: "/images/kids/kitty.png" },
+const setups = [
+    { id: 1, image: "/images/kids/butterfly.png" },
+    { id: 2, image: "/images/kids/space.png" },
+    { id: 3, image: "/images/kids/rainbow.png" },
+    { id: 4, image: "/images/kids/jungle.png" },
+    { id: 5, image: "/images/kids/mermaid.png" },
+    { id: 6, image: "/images/kids/mickey.png" },
+    { id: 7, image: "/images/kids/butterfly.png" },
+    { id: 8, image: "/images/kids/space.png" },
 ];
+
+// ========================================
+// ANIMATED CARD COMPONENT
+// ========================================
+function AnimatedBirthdayCard({ item, index }) {
+    const cardRef = useRef(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisible(true);
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (cardRef.current) observer.observe(cardRef.current);
+        return () => {
+            if (cardRef.current) observer.unobserve(cardRef.current);
+        };
+    }, []);
+
+    return (
+        <Card
+            ref={cardRef}
+            sx={{
+                width: { xs: "100%", sm: "45%", md: "22%" },
+                borderRadius: "16px",
+                overflow: "hidden",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                opacity: visible ? 1 : 0,
+                transform: visible ? "translateY(0)" : "translateY(40px)",
+                transition: "all 0.6s cubic-bezier(0.25, 1, 0.5, 1)",
+                transitionDelay: `${index * 0.05}s`,
+                "&:hover": {
+                    transform: "translateY(-8px)",
+                    boxShadow: "0 12px 30px rgba(0,0,0,0.15)",
+                }
+            }}
+        >
+            <CardMedia
+                component="img"
+                image={item.image}
+                alt={`Setup ${item.id}`}
+                sx={{
+                    height: "280px",
+                    objectFit: "cover",
+                }}
+            />
+        </Card>
+    );
+}
 
 // ========================================
 // MAIN COMPONENT
 // ========================================
 function KidsSpecial() {
-    return (
-        <Box sx={{ width: "100%", overflowX: "hidden", bgcolor: "#fffaf2" }}>
+    const [heroVisible, setHeroVisible] = useState(false);
+    const [categoriesVisible, setCategoriesVisible] = useState(false);
+    const [galleryHeaderInView, setGalleryHeaderInView] = useState(false);
 
-            {/* =====================================
-                HERO BANNER
-            ===================================== */}
+    const heroRef = useRef(null);
+    const categoriesRef = useRef(null);
+    const galleryHeaderRef = useRef(null);
+
+    useEffect(() => {
+        const createObserver = (setVisibleState) => {
+            return new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting) {
+                        setVisibleState(true);
+                    }
+                },
+                {
+                    threshold: 0.15,
+                    rootMargin: "0px 0px -50px 0px"
+                }
+            );
+        };
+
+        const heroObserver = createObserver(setHeroVisible);
+        const categoriesObserver = createObserver(setCategoriesVisible);
+        const galleryHeaderObserver = createObserver(setGalleryHeaderInView);
+
+        if (heroRef.current) heroObserver.observe(heroRef.current);
+        if (categoriesRef.current) categoriesObserver.observe(categoriesRef.current);
+        if (galleryHeaderRef.current) galleryHeaderObserver.observe(galleryHeaderRef.current);
+
+        return () => {
+            if (heroRef.current) heroObserver.unobserve(heroRef.current);
+            if (categoriesRef.current) categoriesObserver.unobserve(categoriesRef.current);
+            if (galleryHeaderRef.current) galleryHeaderObserver.unobserve(galleryHeaderRef.current);
+        };
+    }, []);
+
+    return (
+        <Box
+            sx={{
+                width: "100%",
+                overflowX: "hidden",
+                bgcolor: "#fffaf2",
+                "@keyframes smoothFadeInUp": {
+                    from: { opacity: 0, transform: "translateY(50px)" },
+                    to: { opacity: 1, transform: "translateY(0)" },
+                },
+                "@keyframes smoothFadeInDown": {
+                    from: { opacity: 0, transform: "translateY(-30px)" },
+                    to: { opacity: 1, transform: "translateY(0)" },
+                }
+            }}
+        >
+            {/* HERO BANNER */}
             <Box
+                ref={heroRef}
                 sx={{
                     minHeight: { xs: "250px", sm: "550px", md: "465px" },
                     backgroundImage: `url("/images/kids/kidsbanner.png")`,
-                    backgroundSize: {xs:"100% 100% ",md:"cover"},
+                    backgroundSize: { xs: "100% 100%", md: "cover" },
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
                     display: "flex",
@@ -62,14 +171,20 @@ function KidsSpecial() {
                     position: "relative",
                 }}
             >
-                {/* HERO CONTENT */}
-                <Box sx={{ width: "100%", maxWidth: "850px", color: "#fff", mt: { xs: 0, md: -2 } }}>
-                    {/* Crown */}
+                <Box
+                    sx={{
+                        width: "100%",
+                        maxWidth: "850px",
+                        color: "#fff",
+                        mt: { xs: 0, md: -2 },
+                        opacity: heroVisible ? 1 : 0,
+                        animation: heroVisible ? "smoothFadeInUp 0.9s cubic-bezier(0.215, 0.610, 0.355, 1) forwards" : "none"
+                    }}
+                >
                     <Typography sx={{ color: "#f5bd36", fontSize: { xs: "30px", md: "48px" }, mb: 0.5 }}>
                         ♛
                     </Typography>
 
-                    {/* Main Heading */}
                     <Typography
                         sx={{
                             fontFamily: "Georgia, serif",
@@ -83,13 +198,12 @@ function KidsSpecial() {
                         ✦ Kids Special ✦
                     </Typography>
 
-                    {/* Script Subtitle */}
                     <Typography
                         sx={{
                             mt: 1.5,
                             fontFamily: '"Great Vibes", "Alex Brush", Georgia, cursive',
                             fontStyle: "italic",
-                            fontWeight:"bolder",
+                            fontWeight: "bolder",
                             fontSize: { xs: "24px", sm: "31px", md: "40px" },
                             color: "#efb332",
                             textShadow: "0 2px 5px rgb(26, 26, 26)",
@@ -98,7 +212,6 @@ function KidsSpecial() {
                         Magical Decor for Little Moments
                     </Typography>
 
-                    {/* Description */}
                     <Typography
                         sx={{
                             mt: 2,
@@ -116,10 +229,9 @@ function KidsSpecial() {
                 </Box>
             </Box>
 
-            {/* =====================================
-                CATEGORY BAR (FIXED VIA FLEXBOX)
-            ===================================== */}
+            {/* CATEGORY BAR */}
             <Box
+                ref={categoriesRef}
                 sx={{
                     width: { xs: "80%", md: "80%" },
                     mx: "auto",
@@ -131,18 +243,17 @@ function KidsSpecial() {
                     borderRadius: "24px",
                     boxShadow: "0 10px 30px rgba(70, 20, 0, 0.12)",
                     px: { xs: 2, md: 1 },
-                    py: { xs: 3, md: 2},
+                    py: { xs: 3, md: 2 },
                 }}
             >
-               
                 <Box
                     sx={{
                         display: "flex",
-                        flexDirection: { xs: "row", md: "row" },
-                        flexWrap: "wrap", /* மொபைலில் கீழே உடைய உதவும் */
-                        justifyContent: "space-evenly", /* இடது-வலது சம இடைவெளி */
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        justifyContent: "space-evenly",
                         alignItems: "center",
-                        textAlign:"center",
+                        textAlign: "center",
                         gap: { xs: 2, md: 0 }
                     }}
                 >
@@ -150,7 +261,6 @@ function KidsSpecial() {
                         <Box
                             key={index}
                             sx={{
-                                /* டெஸ்க்டாப்பில் 7 ஐகான்களுக்கும் சமமான அகலத்தை (100 / 7) வழங்குகிறது */
                                 width: { xs: "calc(50% - 16px)", sm: "calc(33.33% - 16px)", md: "14%" },
                                 minHeight: "115px",
                                 display: "flex",
@@ -164,6 +274,13 @@ function KidsSpecial() {
                                     md: index !== kidsCategories.length - 1 ? "1px solid #eadcc8" : "none",
                                 },
                                 cursor: "pointer",
+                                opacity: categoriesVisible ? 1 : 0,
+                                animation: categoriesVisible ? `smoothFadeInDown 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards` : "none",
+                                animationDelay: categoriesVisible ? `${index * 0.08}s` : "none",
+                                transition: "transform 0.3s ease",
+                                "&:hover": {
+                                    transform: "translateY(-2px)"
+                                },
                                 "&:hover .category-icon": {
                                     bgcolor: "#65001b",
                                     color: "#fff",
@@ -171,7 +288,6 @@ function KidsSpecial() {
                                 },
                             }}
                         >
-                            {/* CATEGORY ICON */}
                             <Box
                                 className="category-icon"
                                 sx={{
@@ -191,7 +307,6 @@ function KidsSpecial() {
                                 {item.icon}
                             </Box>
 
-                            {/* CATEGORY TITLE */}
                             <Typography
                                 sx={{
                                     color: "#65001b",
@@ -209,117 +324,42 @@ function KidsSpecial() {
                 </Box>
             </Box>
 
-            {/* =====================================
-                POPULAR KIDS SETUPS
-            ===================================== */}
-            <Box
-                sx={{
-                    pt: { xs: 5, md: 3 },
-                    pb: 5,
-                    px: { xs: 2, sm: 3, md: 4 },
-                    background: "linear-gradient(135deg, #fffdf8, #fff8eb)",
-                }}
-            >
-                {/* HEADING */}
-                <Box sx={{ textAlign: "center", mb: 3 }}>
-                    <Typography
-                        sx={{
-                            fontFamily: "Georgia, serif",
-                            color: "#65001b",
-                            fontSize: { xs: "28px", sm: "35px", md: "50px" },
-                            fontWeight: 600,
-                        }}
-                    >
-                        ✦ Our Popular Kids Setups ✦
-                    </Typography>
-                    <Box sx={{ width: "75px", height: "2px", bgcolor: "#d4a23e", mx: "auto", mt: 1 }} />
-                </Box>
-
-                {/* CARDS */}
-                <Grid container justifyContent="center" spacing={{ xs: 2, sm: 2, md: 3 }}>
-                    {kidsCards.map((item, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={index} sx={{ display: "flex", justifyContent: "center" }}>
-                            <Card
+            {/* POPULAR KIDS SETUPS */}
+            <Box sx={{ py: 10, bgcolor: "#fff" }}>
+                <Container maxWidth="xl">
+                    <Box ref={galleryHeaderRef}>
+                        <Fade in={galleryHeaderInView} timeout={800}>
+                            <Typography
+                                variant="h3"
+                                align="center"
                                 sx={{
-                                    width: "100%",
-                                    ml:5,
-                                    maxWidth: "360px",
-                                    bgcolor: "transparent",
-                                    boxShadow: "none",
-                                    borderRadius: 0,
-                                    overflow: "visible",
-                                    cursor: "pointer",
-                                    "&:hover .kids-image": { transform: "scale(1.08)" },
+                                    color: "#6d1734",
+                                    fontWeight: 700,
+                                    mb: 6,
+                                    fontFamily: "Playfair Display, serif",
                                 }}
                             >
-                                <Box
-                                    sx={{
-                                        width: "100%",
-                                        
-                                        height: { xs: "300px", sm: "280px", md: "300px", lg: "280px" },
-                                        borderRadius: "14px",
-                                        overflow: "hidden",
-                                        boxShadow: "0 5px 14px rgba(50,0,10,0.15)",
-                                    }}
-                                >
-                                    <CardMedia
-                                        component="img"
-                                        className="kids-image"
-                                        image={item.image}
-                                        alt={item.title}
-                                        sx={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                            transition: "transform 0.55s ease",
-                                        }}
-                                    />
-                                </Box>
+                                ✦ Our Recent Kids Setups ✦
+                            </Typography>
+                        </Fade>
+                    </Box>
 
-                                <Box
-                                    sx={{
-                                        mt: 1,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                        gap: 1,
-                                        px: 0.5,
-                                    }}
-                                >
-                                    <Typography
-                                        sx={{
-                                            color: "#4c1520",
-                                            fontSize: "14px",
-                                            fontWeight: 700,
-                                            whiteSpace: "nowrap",
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                        }}
-                                    >
-                                        {item.title}
-                                    </Typography>
-
-                                    <Box
-                                        sx={{
-                                            flexShrink: 0,
-                                            bgcolor: "#ffe1a9",
-                                            border: "1px solid #e0ad52",
-                                            borderRadius: "5px",
-                                            px: 1,
-                                            py: 0.25,
-                                        }}
-                                    >
-                                        <Typography sx={{ color: "#6b351c", fontSize: "10px", fontWeight: 500 }}>
-                                            {item.category}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            justifyContent: "center",
+                            gap: 4,
+                        }}
+                    >
+                        {setups.map((item, index) => (
+                            <AnimatedBirthdayCard key={item.id} item={item} index={index} />
+                        ))}
+                    </Box>
+                </Container>
             </Box>
         </Box>
     );
 }
+
 export default KidsSpecial;
